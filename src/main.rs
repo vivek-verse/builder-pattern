@@ -5,7 +5,7 @@ pub struct Command {
     executable: String,
     args: Vec<String>,
     env: Vec<String>,
-    current_dir: Option<String>,
+    current_dir: std::option::Option<String>,
 }
 
 fn main() {

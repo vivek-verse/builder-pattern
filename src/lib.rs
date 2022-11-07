@@ -4,13 +4,15 @@ use syn::{self, parse_macro_input, DeriveInput};
 
 fn ty_is_option(ty: &syn::Type) -> Option<&syn::Type> {
     if let syn::Type::Path(ref p) = ty {
-        if p.path.segments.len() == 1 && p.path.segments[0].ident != "Option" {
+        if p.path.segments.len() != 1 || p.path.segments[0].ident != "Option" {
             return None;
         }
+
         if let syn::PathArguments::AngleBracketed(ref inner_ty) = p.path.segments[0].arguments {
             if inner_ty.args.len() != 1 {
                 return None;
             }
+
             let inner_ty = inner_ty.args.first().unwrap();
             if let syn::GenericArgument::Type(ref t) = inner_ty {
                 return Some(t);
@@ -54,7 +56,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
         if let Some(inner_ty) = ty_is_option(ty) {
             quote! {
                 pub fn #name(&mut self, #name: #inner_ty) -> &mut Self {
-                    self.#name = #name;
+                    self.#name = Some(#name);
                     self
                 }
             }
